@@ -1,0 +1,829 @@
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/main.c"
+  20              		.section	.text.delay_cycles,"ax",%progbits
+  21              		.align	1
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	delay_cycles:
+  27              	.LVL0:
+  28              	.LFB130:
+   1:Core/Src/main.c **** // #include "../Inc/init.h"
+   2:Core/Src/main.c **** // #include "main.h"
+   3:Core/Src/main.c **** 
+   4:Core/Src/main.c **** // volatile uint8_t btncnt = 0, flag = 0;
+   5:Core/Src/main.c **** 
+   6:Core/Src/main.c **** // int main(void)
+   7:Core/Src/main.c **** // {
+   8:Core/Src/main.c **** //     RCC_Init();
+   9:Core/Src/main.c **** //     ITR_init();
+  10:Core/Src/main.c **** 
+  11:Core/Src/main.c **** //     SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIOAEN);
+  12:Core/Src/main.c **** 
+  13:Core/Src/main.c **** //     SET_BIT(GPIOB->MODER, GPIO_MODER_MODER7_0);
+  14:Core/Src/main.c **** //     SET_BIT(GPIOB->OSPEEDR, GPIO_OSPEEDR_OSPEED7_0);
+  15:Core/Src/main.c **** //     SET_BIT(GPIOB->BSRR, GPIO_BSRR_BR7);
+  16:Core/Src/main.c **** 
+  17:Core/Src/main.c **** //     SET_BIT(GPIOC->MODER, GPIO_MODER_MODER9_1);
+  18:Core/Src/main.c **** //     SET_BIT(GPIOC->OSPEEDR, GPIO_OSPEEDR_OSPEED9);
+  19:Core/Src/main.c **** //     MODIFY_REG(GPIOC->AFR[1], GPIO_AFRH_AFSEL9_Msk, 0x00UL);
+  20:Core/Src/main.c **** 
+  21:Core/Src/main.c **** //     SET_BIT(GPIOA->MODER, GPIO_MODER_MODE8_1);
+  22:Core/Src/main.c **** //     SET_BIT(GPIOA->OSPEEDR, GPIO_OSPEEDR_OSPEED8);
+  23:Core/Src/main.c **** //     CLEAR_BIT(GPIOA->AFR[1], GPIO_AFRH_AFSEL8);
+  24:Core/Src/main.c **** // }
+  25:Core/Src/main.c **** 
+  26:Core/Src/main.c **** 
+  27:Core/Src/main.c **** 
+  28:Core/Src/main.c **** //1 кнопка 3 частоты
+  29:Core/Src/main.c **** //2 кнопка включает последовательно 4 светодиода(цикли�
+  30:Core/Src/main.c **** //выбор светодиода, для которого выбирается частота(дл
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 2
+
+
+  31:Core/Src/main.c **** 
+  32:Core/Src/main.c **** 
+  33:Core/Src/main.c **** /*
+  34:Core/Src/main.c **** volatile uint32_t GlobalTickCount;
+  35:Core/Src/main.c **** uint8_t mode = 1;
+  36:Core/Src/main.c **** uint8_t freq_mode;
+  37:Core/Src/main.c **** uint8_t LedState = 0;
+  38:Core/Src/main.c **** volatile uint32_t BtnStartTick;
+  39:Core/Src/main.c **** uint8_t i;
+  40:Core/Src/main.c **** void blink(uint32_t bitmask, uint8_t freq) //Freq in ms
+  41:Core/Src/main.c **** {
+  42:Core/Src/main.c ****     SET_BIT(GPIOB->BSRR, bitmask);
+  43:Core/Src/main.c ****     milis(freq/2);
+  44:Core/Src/main.c ****     SET_BIT(GPIOB->BSRR, bitmask<<16U);
+  45:Core/Src/main.c ****     milis(freq/2);
+  46:Core/Src/main.c **** }
+  47:Core/Src/main.c **** 
+  48:Core/Src/main.c **** void blink2(uint32_t bitmask1, uint32_t bitmask2, uint8_t freq) //Freq in ms
+  49:Core/Src/main.c **** {
+  50:Core/Src/main.c ****     SET_BIT(GPIOB->BSRR, bitmask1);
+  51:Core/Src/main.c ****     SET_BIT(GPIOB->BSRR, bitmask2);
+  52:Core/Src/main.c ****     milis(freq/2);
+  53:Core/Src/main.c ****     SET_BIT(GPIOB->BSRR, bitmask1<<16U);
+  54:Core/Src/main.c ****     SET_BIT(GPIOB->BSRR, bitmask2<<16U);
+  55:Core/Src/main.c ****     milis(freq/2);
+  56:Core/Src/main.c **** }
+  57:Core/Src/main.c **** 
+  58:Core/Src/main.c **** int main(void)
+  59:Core/Src/main.c **** {
+  60:Core/Src/main.c ****     uint32_t led_bitmasks[6] = {GPIO_BSRR_BS0, GPIO_BSRR_BS7, GPIO_BSRR_BS14, GPIO_BSRR_BS8, GPIO_B
+  61:Core/Src/main.c ****     uint16_t freq1[3] = {2500, 625, 385};
+  62:Core/Src/main.c ****     uint16_t freq2[3] = {3300, 625, 435};
+  63:Core/Src/main.c ****     GPIO_Init();
+  64:Core/Src/main.c ****     CLK_CLEAR();
+  65:Core/Src/main.c ****     RCC_Init();
+  66:Core/Src/main.c ****     ITR_init();
+  67:Core/Src/main.c ****     SysTick_Init();
+  68:Core/Src/main.c **** 
+  69:Core/Src/main.c ****     while(1)
+  70:Core/Src/main.c ****     {
+  71:Core/Src/main.c ****         switch( mode)
+  72:Core/Src/main.c ****         {
+  73:Core/Src/main.c ****             case 1:
+  74:Core/Src/main.c ****                 for( i = 0; i<6; i++)
+  75:Core/Src/main.c ****                 {
+  76:Core/Src/main.c ****                     blink(led_bitmasks[i],freq1[freq_mode]);
+  77:Core/Src/main.c ****                 }
+  78:Core/Src/main.c ****             break;
+  79:Core/Src/main.c **** 
+  80:Core/Src/main.c ****             case 2:
+  81:Core/Src/main.c ****                 
+  82:Core/Src/main.c ****             for(i = 0; i<3; i++)
+  83:Core/Src/main.c ****             {
+  84:Core/Src/main.c ****                 blink2(led_bitmasks[i], led_bitmasks[i+3],freq2[freq_mode]);
+  85:Core/Src/main.c ****             }
+  86:Core/Src/main.c ****             break;
+  87:Core/Src/main.c ****         }
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 3
+
+
+  88:Core/Src/main.c ****     }
+  89:Core/Src/main.c **** 
+  90:Core/Src/main.c **** 
+  91:Core/Src/main.c **** }*/
+  92:Core/Src/main.c **** 
+  93:Core/Src/main.c **** #include "../Inc/init.h"
+  94:Core/Src/main.c **** 
+  95:Core/Src/main.c **** static void delay_cycles(volatile uint32_t t) //time in ms
+  96:Core/Src/main.c **** {
+  29              		.loc 1 96 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              		.loc 1 96 1 is_stmt 0 view .LVU1
+  35 0000 82B0     		sub	sp, sp, #8
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38 0002 0190     		str	r0, [sp, #4]
+  97:Core/Src/main.c ****     while (t--) __NOP();
+  39              		.loc 1 97 5 is_stmt 1 view .LVU2
+  40              		.loc 1 97 11 is_stmt 0 view .LVU3
+  41 0004 00E0     		b	.L2
+  42              	.L3:
+  43              		.loc 1 97 17 is_stmt 1 discriminator 2 view .LVU4
+  44              		.syntax unified
+  45              	@ 97 "Core/Src/main.c" 1
+  46 0006 00BF     		nop
+  47              	@ 0 "" 2
+  48              		.thumb
+  49              		.syntax unified
+  50              	.L2:
+  51              		.loc 1 97 12 discriminator 1 view .LVU5
+  52              		.loc 1 97 13 is_stmt 0 discriminator 1 view .LVU6
+  53 0008 019B     		ldr	r3, [sp, #4]
+  54 000a 5A1E     		subs	r2, r3, #1
+  55 000c 0192     		str	r2, [sp, #4]
+  56              		.loc 1 97 12 discriminator 1 view .LVU7
+  57 000e 002B     		cmp	r3, #0
+  58 0010 F9D1     		bne	.L3
+  98:Core/Src/main.c **** }
+  59              		.loc 1 98 1 view .LVU8
+  60 0012 02B0     		add	sp, sp, #8
+  61              	.LCFI1:
+  62              		.cfi_def_cfa_offset 0
+  63              		@ sp needed
+  64 0014 7047     		bx	lr
+  65              		.cfi_endproc
+  66              	.LFE130:
+  68              		.section	.text.debounce,"ax",%progbits
+  69              		.align	1
+  70              		.syntax unified
+  71              		.thumb
+  72              		.thumb_func
+  74              	debounce:
+  75              	.LVL1:
+  76              	.LFB131:
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 4
+
+
+  99:Core/Src/main.c **** 
+ 100:Core/Src/main.c **** static uint8_t debounce(uint32_t bitmask)
+ 101:Core/Src/main.c **** {
+  77              		.loc 1 101 1 is_stmt 1 view -0
+  78              		.cfi_startproc
+  79              		@ args = 0, pretend = 0, frame = 0
+  80              		@ frame_needed = 0, uses_anonymous_args = 0
+  81              		.loc 1 101 1 is_stmt 0 view .LVU10
+  82 0000 38B5     		push	{r3, r4, r5, lr}
+  83              	.LCFI2:
+  84              		.cfi_def_cfa_offset 16
+  85              		.cfi_offset 3, -16
+  86              		.cfi_offset 4, -12
+  87              		.cfi_offset 5, -8
+  88              		.cfi_offset 14, -4
+  89 0002 0546     		mov	r5, r0
+ 102:Core/Src/main.c ****     for (int i = 0; i < 5; i++)
+  90              		.loc 1 102 5 is_stmt 1 view .LVU11
+  91              	.LBB2:
+  92              		.loc 1 102 10 view .LVU12
+  93              	.LVL2:
+  94              		.loc 1 102 14 is_stmt 0 view .LVU13
+  95 0004 0024     		movs	r4, #0
+  96              	.LVL3:
+  97              	.L6:
+  98              		.loc 1 102 23 is_stmt 1 discriminator 1 view .LVU14
+  99 0006 042C     		cmp	r4, #4
+ 100 0008 09DC     		bgt	.L11
+ 103:Core/Src/main.c ****     {
+ 104:Core/Src/main.c ****         if (BIT_READ(GPIOD->IDR, bitmask))
+ 101              		.loc 1 104 9 view .LVU15
+ 102              		.loc 1 104 13 is_stmt 0 view .LVU16
+ 103 000a 074B     		ldr	r3, .L12
+ 104 000c 1B69     		ldr	r3, [r3, #16]
+ 105              		.loc 1 104 12 view .LVU17
+ 106 000e 2B42     		tst	r3, r5
+ 107 0010 07D1     		bne	.L9
+ 105:Core/Src/main.c ****             return 0;
+ 106:Core/Src/main.c ****         delay_cycles(50000);
+ 108              		.loc 1 106 9 is_stmt 1 view .LVU18
+ 109 0012 4CF25030 		movw	r0, #50000
+ 110 0016 FFF7FEFF 		bl	delay_cycles
+ 111              	.LVL4:
+ 102:Core/Src/main.c ****     {
+ 112              		.loc 1 102 29 discriminator 2 view .LVU19
+ 113 001a 0134     		adds	r4, r4, #1
+ 114              	.LVL5:
+ 102:Core/Src/main.c ****     {
+ 115              		.loc 1 102 29 is_stmt 0 discriminator 2 view .LVU20
+ 116 001c F3E7     		b	.L6
+ 117              	.L11:
+ 102:Core/Src/main.c ****     {
+ 118              		.loc 1 102 29 discriminator 2 view .LVU21
+ 119              	.LBE2:
+ 107:Core/Src/main.c ****     }
+ 108:Core/Src/main.c ****     return 1;
+ 120              		.loc 1 108 12 view .LVU22
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 5
+
+
+ 121 001e 0120     		movs	r0, #1
+ 122              	.L7:
+ 109:Core/Src/main.c **** }
+ 123              		.loc 1 109 1 view .LVU23
+ 124 0020 38BD     		pop	{r3, r4, r5, pc}
+ 125              	.LVL6:
+ 126              	.L9:
+ 127              	.LBB3:
+ 105:Core/Src/main.c ****         delay_cycles(50000);
+ 128              		.loc 1 105 20 view .LVU24
+ 129 0022 0020     		movs	r0, #0
+ 130 0024 FCE7     		b	.L7
+ 131              	.L13:
+ 132 0026 00BF     		.align	2
+ 133              	.L12:
+ 134 0028 000C0240 		.word	1073875968
+ 135              	.LBE3:
+ 136              		.cfi_endproc
+ 137              	.LFE131:
+ 139              		.section	.text.main,"ax",%progbits
+ 140              		.align	1
+ 141              		.global	main
+ 142              		.syntax unified
+ 143              		.thumb
+ 144              		.thumb_func
+ 146              	main:
+ 147              	.LFB132:
+ 110:Core/Src/main.c **** 
+ 111:Core/Src/main.c **** 
+ 112:Core/Src/main.c **** uint8_t btn1 = 0;
+ 113:Core/Src/main.c **** uint8_t btn2 = 0;
+ 114:Core/Src/main.c **** uint8_t btn2_state = 0;
+ 115:Core/Src/main.c **** uint8_t led_flag = 0;
+ 116:Core/Src/main.c **** int main(void)
+ 117:Core/Src/main.c **** {
+ 148              		.loc 1 117 1 is_stmt 1 view -0
+ 149              		.cfi_startproc
+ 150              		@ Volatile: function does not return.
+ 151              		@ args = 0, pretend = 0, frame = 0
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153 0000 08B5     		push	{r3, lr}
+ 154              	.LCFI3:
+ 155              		.cfi_def_cfa_offset 8
+ 156              		.cfi_offset 3, -8
+ 157              		.cfi_offset 14, -4
+ 118:Core/Src/main.c ****     Led_init();
+ 158              		.loc 1 118 5 view .LVU26
+ 159 0002 FFF7FEFF 		bl	Led_init
+ 160              	.LVL7:
+ 119:Core/Src/main.c ****     Buttons_Init();
+ 161              		.loc 1 119 5 view .LVU27
+ 162 0006 FFF7FEFF 		bl	Buttons_Init
+ 163              	.LVL8:
+ 120:Core/Src/main.c ****     SET_BIT(GPIOD->BSRR, GPIO_BSRR_BR0);    
+ 164              		.loc 1 120 5 view .LVU28
+ 165 000a 854A     		ldr	r2, .L30
+ 166 000c 9369     		ldr	r3, [r2, #24]
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 6
+
+
+ 167 000e 43F48033 		orr	r3, r3, #65536
+ 168 0012 9361     		str	r3, [r2, #24]
+ 169 0014 24E0     		b	.L15
+ 170              	.L29:
+ 121:Core/Src/main.c **** 
+ 122:Core/Src/main.c ****     while (1)
+ 123:Core/Src/main.c ****     {
+ 124:Core/Src/main.c ****         
+ 125:Core/Src/main.c ****         if (debounce(GPIO_IDR_ID3))
+ 126:Core/Src/main.c ****         {
+ 127:Core/Src/main.c ****             btn2 = 1;
+ 171              		.loc 1 127 13 view .LVU29
+ 172              		.loc 1 127 18 is_stmt 0 view .LVU30
+ 173 0016 0123     		movs	r3, #1
+ 174 0018 824A     		ldr	r2, .L30+4
+ 175 001a 1370     		strb	r3, [r2]
+ 128:Core/Src/main.c ****                 
+ 129:Core/Src/main.c ****                 btn2_state = 1;
+ 176              		.loc 1 129 17 is_stmt 1 view .LVU31
+ 177              		.loc 1 129 28 is_stmt 0 view .LVU32
+ 178 001c 824A     		ldr	r2, .L30+8
+ 179 001e 1370     		strb	r3, [r2]
+ 130:Core/Src/main.c ****                 delay_cycles(50000);
+ 180              		.loc 1 130 17 is_stmt 1 view .LVU33
+ 181 0020 4CF25030 		movw	r0, #50000
+ 182 0024 FFF7FEFF 		bl	delay_cycles
+ 183              	.LVL9:
+ 184 0028 1FE0     		b	.L16
+ 185              	.L26:
+ 131:Core/Src/main.c ****         }
+ 132:Core/Src/main.c ****         btn2 = 0;
+ 133:Core/Src/main.c **** 
+ 134:Core/Src/main.c ****         if (btn2_state == 0)
+ 135:Core/Src/main.c ****         {
+ 136:Core/Src/main.c ****  
+ 137:Core/Src/main.c ****             PD0_inp();
+ 138:Core/Src/main.c **** 
+ 139:Core/Src/main.c ****             if (debounce(GPIO_IDR_ID0))
+ 140:Core/Src/main.c ****             {
+ 141:Core/Src/main.c ****                 btn1++;
+ 142:Core/Src/main.c ****                     switch(btn1)
+ 143:Core/Src/main.c ****                     {
+ 144:Core/Src/main.c ****                     case 1:
+ 145:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_1);
+ 186              		.loc 1 145 25 view .LVU34
+ 187 002a 7D4B     		ldr	r3, .L30
+ 188 002c 9A69     		ldr	r2, [r3, #24]
+ 189 002e 42F00202 		orr	r2, r2, #2
+ 190 0032 9A61     		str	r2, [r3, #24]
+ 146:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_2);
+ 191              		.loc 1 146 25 view .LVU35
+ 192 0034 9A69     		ldr	r2, [r3, #24]
+ 193 0036 42F48022 		orr	r2, r2, #262144
+ 194 003a 9A61     		str	r2, [r3, #24]
+ 147:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_0);
+ 195              		.loc 1 147 25 view .LVU36
+ 196 003c A3F50063 		sub	r3, r3, #2048
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 7
+
+
+ 197 0040 9A69     		ldr	r2, [r3, #24]
+ 198 0042 42F48032 		orr	r2, r2, #65536
+ 199 0046 9A61     		str	r2, [r3, #24]
+ 148:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 200              		.loc 1 148 25 view .LVU37
+ 201 0048 9A69     		ldr	r2, [r3, #24]
+ 202 004a 42F40002 		orr	r2, r2, #8388608
+ 203 004e 9A61     		str	r2, [r3, #24]
+ 149:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 204              		.loc 1 149 25 view .LVU38
+ 205 0050 9A69     		ldr	r2, [r3, #24]
+ 206 0052 42F08042 		orr	r2, r2, #1073741824
+ 207 0056 9A61     		str	r2, [r3, #24]
+ 150:Core/Src/main.c ****                         break;
+ 208              		.loc 1 150 25 view .LVU39
+ 209              	.L19:
+ 151:Core/Src/main.c ****                     case 2:
+ 152:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_1);
+ 153:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 154:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_0);
+ 155:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 156:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 157:Core/Src/main.c ****                         break;
+ 158:Core/Src/main.c ****                     case 3:
+ 159:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_1);
+ 160:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 161:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_0);
+ 162:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 163:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 164:Core/Src/main.c ****                         break;
+ 165:Core/Src/main.c ****                     case 4:
+ 166:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_1);
+ 167:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 168:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_0);
+ 169:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_7);
+ 170:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 171:Core/Src/main.c ****                         break;
+ 172:Core/Src/main.c ****                     case 5:
+ 173:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_1);
+ 174:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 175:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_0);
+ 176:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_7);
+ 177:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_14);
+ 178:Core/Src/main.c ****                         break;
+ 179:Core/Src/main.c ****                     case 6:
+ 180:Core/Src/main.c ****                         btn1 = 0;
+ 181:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_1);
+ 182:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_2);
+ 183:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_0);
+ 184:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 185:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 186:Core/Src/main.c ****                         break;
+ 187:Core/Src/main.c ****                     }
+ 188:Core/Src/main.c ****                     delay_cycles(50000);
+ 210              		.loc 1 188 21 view .LVU40
+ 211 0058 4CF25030 		movw	r0, #50000
+ 212 005c FFF7FEFF 		bl	delay_cycles
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 8
+
+
+ 213              	.LVL10:
+ 214              	.L15:
+ 122:Core/Src/main.c ****     {
+ 215              		.loc 1 122 5 view .LVU41
+ 125:Core/Src/main.c ****         {
+ 216              		.loc 1 125 9 view .LVU42
+ 125:Core/Src/main.c ****         {
+ 217              		.loc 1 125 13 is_stmt 0 view .LVU43
+ 218 0060 0820     		movs	r0, #8
+ 219 0062 FFF7FEFF 		bl	debounce
+ 220              	.LVL11:
+ 125:Core/Src/main.c ****         {
+ 221              		.loc 1 125 12 discriminator 1 view .LVU44
+ 222 0066 0028     		cmp	r0, #0
+ 223 0068 D5D1     		bne	.L29
+ 224              	.L16:
+ 132:Core/Src/main.c **** 
+ 225              		.loc 1 132 9 is_stmt 1 view .LVU45
+ 132:Core/Src/main.c **** 
+ 226              		.loc 1 132 14 is_stmt 0 view .LVU46
+ 227 006a 6E4B     		ldr	r3, .L30+4
+ 228 006c 0022     		movs	r2, #0
+ 229 006e 1A70     		strb	r2, [r3]
+ 134:Core/Src/main.c ****         {
+ 230              		.loc 1 134 9 is_stmt 1 view .LVU47
+ 134:Core/Src/main.c ****         {
+ 231              		.loc 1 134 24 is_stmt 0 view .LVU48
+ 232 0070 6D4B     		ldr	r3, .L30+8
+ 233 0072 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 134:Core/Src/main.c ****         {
+ 234              		.loc 1 134 12 view .LVU49
+ 235 0074 002B     		cmp	r3, #0
+ 236 0076 40F09A80 		bne	.L17
+ 137:Core/Src/main.c **** 
+ 237              		.loc 1 137 13 is_stmt 1 view .LVU50
+ 238 007a FFF7FEFF 		bl	PD0_inp
+ 239              	.LVL12:
+ 139:Core/Src/main.c ****             {
+ 240              		.loc 1 139 13 view .LVU51
+ 139:Core/Src/main.c ****             {
+ 241              		.loc 1 139 17 is_stmt 0 view .LVU52
+ 242 007e 0120     		movs	r0, #1
+ 243 0080 FFF7FEFF 		bl	debounce
+ 244              	.LVL13:
+ 139:Core/Src/main.c ****             {
+ 245              		.loc 1 139 16 discriminator 1 view .LVU53
+ 246 0084 0028     		cmp	r0, #0
+ 247 0086 EBD0     		beq	.L15
+ 141:Core/Src/main.c ****                     switch(btn1)
+ 248              		.loc 1 141 17 is_stmt 1 view .LVU54
+ 141:Core/Src/main.c ****                     switch(btn1)
+ 249              		.loc 1 141 21 is_stmt 0 view .LVU55
+ 250 0088 684A     		ldr	r2, .L30+12
+ 251 008a 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 252 008c 0133     		adds	r3, r3, #1
+ 253 008e DBB2     		uxtb	r3, r3
+ 254 0090 1370     		strb	r3, [r2]
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 9
+
+
+ 142:Core/Src/main.c ****                     {
+ 255              		.loc 1 142 21 is_stmt 1 view .LVU56
+ 256 0092 013B     		subs	r3, r3, #1
+ 257 0094 052B     		cmp	r3, #5
+ 258 0096 DFD8     		bhi	.L19
+ 259 0098 01A2     		adr	r2, .L21
+ 260 009a 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 261 009e 00BF     		.p2align 2
+ 262              	.L21:
+ 263 00a0 2B000000 		.word	.L26+1
+ 264 00a4 B9000000 		.word	.L25+1
+ 265 00a8 E9000000 		.word	.L24+1
+ 266 00ac 19010000 		.word	.L23+1
+ 267 00b0 49010000 		.word	.L22+1
+ 268 00b4 79010000 		.word	.L20+1
+ 269              		.p2align 1
+ 270              	.L25:
+ 152:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 271              		.loc 1 152 25 view .LVU57
+ 272 00b8 594B     		ldr	r3, .L30
+ 273 00ba 9A69     		ldr	r2, [r3, #24]
+ 274 00bc 42F00202 		orr	r2, r2, #2
+ 275 00c0 9A61     		str	r2, [r3, #24]
+ 153:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_0);
+ 276              		.loc 1 153 25 view .LVU58
+ 277 00c2 9A69     		ldr	r2, [r3, #24]
+ 278 00c4 42F00402 		orr	r2, r2, #4
+ 279 00c8 9A61     		str	r2, [r3, #24]
+ 154:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 280              		.loc 1 154 25 view .LVU59
+ 281 00ca A3F50063 		sub	r3, r3, #2048
+ 282 00ce 9A69     		ldr	r2, [r3, #24]
+ 283 00d0 42F48032 		orr	r2, r2, #65536
+ 284 00d4 9A61     		str	r2, [r3, #24]
+ 155:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 285              		.loc 1 155 25 view .LVU60
+ 286 00d6 9A69     		ldr	r2, [r3, #24]
+ 287 00d8 42F40002 		orr	r2, r2, #8388608
+ 288 00dc 9A61     		str	r2, [r3, #24]
+ 156:Core/Src/main.c ****                         break;
+ 289              		.loc 1 156 25 view .LVU61
+ 290 00de 9A69     		ldr	r2, [r3, #24]
+ 291 00e0 42F08042 		orr	r2, r2, #1073741824
+ 292 00e4 9A61     		str	r2, [r3, #24]
+ 157:Core/Src/main.c ****                     case 3:
+ 293              		.loc 1 157 25 view .LVU62
+ 294 00e6 B7E7     		b	.L19
+ 295              	.L24:
+ 159:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 296              		.loc 1 159 25 view .LVU63
+ 297 00e8 4D4B     		ldr	r3, .L30
+ 298 00ea 9A69     		ldr	r2, [r3, #24]
+ 299 00ec 42F00202 		orr	r2, r2, #2
+ 300 00f0 9A61     		str	r2, [r3, #24]
+ 160:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_0);
+ 301              		.loc 1 160 25 view .LVU64
+ 302 00f2 9A69     		ldr	r2, [r3, #24]
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 10
+
+
+ 303 00f4 42F00402 		orr	r2, r2, #4
+ 304 00f8 9A61     		str	r2, [r3, #24]
+ 161:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 305              		.loc 1 161 25 view .LVU65
+ 306 00fa A3F50063 		sub	r3, r3, #2048
+ 307 00fe 9A69     		ldr	r2, [r3, #24]
+ 308 0100 42F00102 		orr	r2, r2, #1
+ 309 0104 9A61     		str	r2, [r3, #24]
+ 162:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 310              		.loc 1 162 25 view .LVU66
+ 311 0106 9A69     		ldr	r2, [r3, #24]
+ 312 0108 42F40002 		orr	r2, r2, #8388608
+ 313 010c 9A61     		str	r2, [r3, #24]
+ 163:Core/Src/main.c ****                         break;
+ 314              		.loc 1 163 25 view .LVU67
+ 315 010e 9A69     		ldr	r2, [r3, #24]
+ 316 0110 42F08042 		orr	r2, r2, #1073741824
+ 317 0114 9A61     		str	r2, [r3, #24]
+ 164:Core/Src/main.c ****                     case 4:
+ 318              		.loc 1 164 25 view .LVU68
+ 319 0116 9FE7     		b	.L19
+ 320              	.L23:
+ 166:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 321              		.loc 1 166 25 view .LVU69
+ 322 0118 414B     		ldr	r3, .L30
+ 323 011a 9A69     		ldr	r2, [r3, #24]
+ 324 011c 42F00202 		orr	r2, r2, #2
+ 325 0120 9A61     		str	r2, [r3, #24]
+ 167:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_0);
+ 326              		.loc 1 167 25 view .LVU70
+ 327 0122 9A69     		ldr	r2, [r3, #24]
+ 328 0124 42F00402 		orr	r2, r2, #4
+ 329 0128 9A61     		str	r2, [r3, #24]
+ 168:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_7);
+ 330              		.loc 1 168 25 view .LVU71
+ 331 012a A3F50063 		sub	r3, r3, #2048
+ 332 012e 9A69     		ldr	r2, [r3, #24]
+ 333 0130 42F00102 		orr	r2, r2, #1
+ 334 0134 9A61     		str	r2, [r3, #24]
+ 169:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 335              		.loc 1 169 25 view .LVU72
+ 336 0136 9A69     		ldr	r2, [r3, #24]
+ 337 0138 42F08002 		orr	r2, r2, #128
+ 338 013c 9A61     		str	r2, [r3, #24]
+ 170:Core/Src/main.c ****                         break;
+ 339              		.loc 1 170 25 view .LVU73
+ 340 013e 9A69     		ldr	r2, [r3, #24]
+ 341 0140 42F08042 		orr	r2, r2, #1073741824
+ 342 0144 9A61     		str	r2, [r3, #24]
+ 171:Core/Src/main.c ****                     case 5:
+ 343              		.loc 1 171 25 view .LVU74
+ 344 0146 87E7     		b	.L19
+ 345              	.L22:
+ 173:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_2);
+ 346              		.loc 1 173 25 view .LVU75
+ 347 0148 354B     		ldr	r3, .L30
+ 348 014a 9A69     		ldr	r2, [r3, #24]
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 11
+
+
+ 349 014c 42F00202 		orr	r2, r2, #2
+ 350 0150 9A61     		str	r2, [r3, #24]
+ 174:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_0);
+ 351              		.loc 1 174 25 view .LVU76
+ 352 0152 9A69     		ldr	r2, [r3, #24]
+ 353 0154 42F00402 		orr	r2, r2, #4
+ 354 0158 9A61     		str	r2, [r3, #24]
+ 175:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_7);
+ 355              		.loc 1 175 25 view .LVU77
+ 356 015a A3F50063 		sub	r3, r3, #2048
+ 357 015e 9A69     		ldr	r2, [r3, #24]
+ 358 0160 42F00102 		orr	r2, r2, #1
+ 359 0164 9A61     		str	r2, [r3, #24]
+ 176:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_SET_14);
+ 360              		.loc 1 176 25 view .LVU78
+ 361 0166 9A69     		ldr	r2, [r3, #24]
+ 362 0168 42F08002 		orr	r2, r2, #128
+ 363 016c 9A61     		str	r2, [r3, #24]
+ 177:Core/Src/main.c ****                         break;
+ 364              		.loc 1 177 25 view .LVU79
+ 365 016e 9A69     		ldr	r2, [r3, #24]
+ 366 0170 42F48042 		orr	r2, r2, #16384
+ 367 0174 9A61     		str	r2, [r3, #24]
+ 178:Core/Src/main.c ****                     case 6:
+ 368              		.loc 1 178 25 view .LVU80
+ 369 0176 6FE7     		b	.L19
+ 370              	.L20:
+ 180:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_1);
+ 371              		.loc 1 180 25 view .LVU81
+ 180:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_1);
+ 372              		.loc 1 180 30 is_stmt 0 view .LVU82
+ 373 0178 2C4B     		ldr	r3, .L30+12
+ 374 017a 0022     		movs	r2, #0
+ 375 017c 1A70     		strb	r2, [r3]
+ 181:Core/Src/main.c ****                         SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_2);
+ 376              		.loc 1 181 25 is_stmt 1 view .LVU83
+ 377 017e 284B     		ldr	r3, .L30
+ 378 0180 9A69     		ldr	r2, [r3, #24]
+ 379 0182 42F40032 		orr	r2, r2, #131072
+ 380 0186 9A61     		str	r2, [r3, #24]
+ 182:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_0);
+ 381              		.loc 1 182 25 view .LVU84
+ 382 0188 9A69     		ldr	r2, [r3, #24]
+ 383 018a 42F48022 		orr	r2, r2, #262144
+ 384 018e 9A61     		str	r2, [r3, #24]
+ 183:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 385              		.loc 1 183 25 view .LVU85
+ 386 0190 A3F50063 		sub	r3, r3, #2048
+ 387 0194 9A69     		ldr	r2, [r3, #24]
+ 388 0196 42F48032 		orr	r2, r2, #65536
+ 389 019a 9A61     		str	r2, [r3, #24]
+ 184:Core/Src/main.c ****                         SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 390              		.loc 1 184 25 view .LVU86
+ 391 019c 9A69     		ldr	r2, [r3, #24]
+ 392 019e 42F40002 		orr	r2, r2, #8388608
+ 393 01a2 9A61     		str	r2, [r3, #24]
+ 185:Core/Src/main.c ****                         break;
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 12
+
+
+ 394              		.loc 1 185 25 view .LVU87
+ 395 01a4 9A69     		ldr	r2, [r3, #24]
+ 396 01a6 42F08042 		orr	r2, r2, #1073741824
+ 397 01aa 9A61     		str	r2, [r3, #24]
+ 186:Core/Src/main.c ****                     }
+ 398              		.loc 1 186 25 view .LVU88
+ 399 01ac 54E7     		b	.L19
+ 400              	.L17:
+ 189:Core/Src/main.c ****                 
+ 190:Core/Src/main.c ****             }
+ 191:Core/Src/main.c ****             
+ 192:Core/Src/main.c ****         }
+ 193:Core/Src/main.c ****         else
+ 194:Core/Src/main.c ****         {
+ 195:Core/Src/main.c ****             PD0_out();
+ 401              		.loc 1 195 13 view .LVU89
+ 402 01ae FFF7FEFF 		bl	PD0_out
+ 403              	.LVL14:
+ 196:Core/Src/main.c ****   
+ 197:Core/Src/main.c ****             while (1)
+ 404              		.loc 1 197 13 view .LVU90
+ 198:Core/Src/main.c ****             {
+ 199:Core/Src/main.c ****                 SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_1);
+ 405              		.loc 1 199 17 view .LVU91
+ 406 01b2 1B4B     		ldr	r3, .L30
+ 407 01b4 9A69     		ldr	r2, [r3, #24]
+ 408 01b6 42F40032 		orr	r2, r2, #131072
+ 409 01ba 9A61     		str	r2, [r3, #24]
+ 200:Core/Src/main.c ****                 SET_BIT(GPIOD->BSRR, GPIO_PIN_RESET_2);
+ 410              		.loc 1 200 17 view .LVU92
+ 411 01bc 9A69     		ldr	r2, [r3, #24]
+ 412 01be 42F48022 		orr	r2, r2, #262144
+ 413 01c2 9A61     		str	r2, [r3, #24]
+ 201:Core/Src/main.c ****                 SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_0);
+ 414              		.loc 1 201 17 view .LVU93
+ 415 01c4 1A4A     		ldr	r2, .L30+16
+ 416 01c6 9169     		ldr	r1, [r2, #24]
+ 417 01c8 41F48031 		orr	r1, r1, #65536
+ 418 01cc 9161     		str	r1, [r2, #24]
+ 202:Core/Src/main.c ****                 SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_7);
+ 419              		.loc 1 202 17 view .LVU94
+ 420 01ce 9169     		ldr	r1, [r2, #24]
+ 421 01d0 41F40001 		orr	r1, r1, #8388608
+ 422 01d4 9161     		str	r1, [r2, #24]
+ 203:Core/Src/main.c ****                 SET_BIT(GPIOB->BSRR, GPIO_PIN_RESET_14);
+ 423              		.loc 1 203 17 view .LVU95
+ 424 01d6 9169     		ldr	r1, [r2, #24]
+ 425 01d8 41F08041 		orr	r1, r1, #1073741824
+ 426 01dc 9161     		str	r1, [r2, #24]
+ 204:Core/Src/main.c ****                 SET_BIT(GPIOD->BSRR, GPIO_PIN_SET_0);
+ 427              		.loc 1 204 17 view .LVU96
+ 428 01de 9A69     		ldr	r2, [r3, #24]
+ 429 01e0 42F00102 		orr	r2, r2, #1
+ 430 01e4 9A61     		str	r2, [r3, #24]
+ 205:Core/Src/main.c **** 
+ 206:Core/Src/main.c ****                 if (debounce(GPIO_IDR_ID3))
+ 431              		.loc 1 206 17 view .LVU97
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 13
+
+
+ 432              		.loc 1 206 21 is_stmt 0 view .LVU98
+ 433 01e6 0820     		movs	r0, #8
+ 434 01e8 FFF7FEFF 		bl	debounce
+ 435              	.LVL15:
+ 436              		.loc 1 206 20 discriminator 1 view .LVU99
+ 437 01ec 0028     		cmp	r0, #0
+ 438 01ee 3FF437AF 		beq	.L15
+ 207:Core/Src/main.c ****                 {
+ 208:Core/Src/main.c ****                         BIT_SET(GPIOD_BSRR, GPIO_BSRR_BS0);
+ 439              		.loc 1 208 25 is_stmt 1 view .LVU100
+ 440 01f2 104A     		ldr	r2, .L30+20
+ 441 01f4 D2F8183C 		ldr	r3, [r2, #3096]
+ 442 01f8 43F00101 		orr	r1, r3, #1
+ 443 01fc C2F8181C 		str	r1, [r2, #3096]
+ 209:Core/Src/main.c ****                         btn2 = 1;
+ 444              		.loc 1 209 25 view .LVU101
+ 445              		.loc 1 209 30 is_stmt 0 view .LVU102
+ 446 0200 0849     		ldr	r1, .L30+4
+ 447 0202 0120     		movs	r0, #1
+ 448 0204 0870     		strb	r0, [r1]
+ 210:Core/Src/main.c ****                         BIT_SET(GPIOD_BSRR, GPIO_BSRR_BR0);
+ 449              		.loc 1 210 25 is_stmt 1 view .LVU103
+ 450 0206 43F00113 		orr	r3, r3, #65537
+ 451 020a C2F8183C 		str	r3, [r2, #3096]
+ 211:Core/Src/main.c ****                         PD0_inp();
+ 452              		.loc 1 211 25 view .LVU104
+ 453 020e FFF7FEFF 		bl	PD0_inp
+ 454              	.LVL16:
+ 212:Core/Src/main.c ****                         btn2_state = 0;
+ 455              		.loc 1 212 25 view .LVU105
+ 456              		.loc 1 212 36 is_stmt 0 view .LVU106
+ 457 0212 054B     		ldr	r3, .L30+8
+ 458 0214 0022     		movs	r2, #0
+ 459 0216 1A70     		strb	r2, [r3]
+ 213:Core/Src/main.c ****                         delay_cycles(500000);
+ 460              		.loc 1 213 25 is_stmt 1 view .LVU107
+ 461 0218 0748     		ldr	r0, .L30+24
+ 462 021a FFF7FEFF 		bl	delay_cycles
+ 463              	.LVL17:
+ 464 021e 1FE7     		b	.L15
+ 465              	.L31:
+ 466              		.align	2
+ 467              	.L30:
+ 468 0220 000C0240 		.word	1073875968
+ 469 0224 00000000 		.word	btn2
+ 470 0228 00000000 		.word	btn2_state
+ 471 022c 00000000 		.word	btn1
+ 472 0230 00040240 		.word	1073873920
+ 473 0234 00000240 		.word	1073872896
+ 474 0238 20A10700 		.word	500000
+ 475              		.cfi_endproc
+ 476              	.LFE132:
+ 478              		.global	led_flag
+ 479              		.section	.bss.led_flag,"aw",%nobits
+ 482              	led_flag:
+ 483 0000 00       		.space	1
+ 484              		.global	btn2_state
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 14
+
+
+ 485              		.section	.bss.btn2_state,"aw",%nobits
+ 488              	btn2_state:
+ 489 0000 00       		.space	1
+ 490              		.global	btn2
+ 491              		.section	.bss.btn2,"aw",%nobits
+ 494              	btn2:
+ 495 0000 00       		.space	1
+ 496              		.global	btn1
+ 497              		.section	.bss.btn1,"aw",%nobits
+ 500              	btn1:
+ 501 0000 00       		.space	1
+ 502              		.text
+ 503              	.Letext0:
+ 504              		.file 2 "C:/Users/Nez3rt/OneDrive/\320\240\320\260\320\261\320\276\321\207\320\270\320\271 \321\20
+ 505              		.file 3 "C:/Users/Nez3rt/OneDrive/\320\240\320\260\320\261\320\276\321\207\320\270\320\271 \321\20
+ 506              		.file 4 "CMSIS/Devices/STM32F4xx/Inc/STM32F429ZI/stm32f429xx.h"
+ 507              		.file 5 "Core/Src/../Inc/init.h"
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:21     .text.delay_cycles:00000000 $t
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:26     .text.delay_cycles:00000000 delay_cycles
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:69     .text.debounce:00000000 $t
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:74     .text.debounce:00000000 debounce
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:134    .text.debounce:00000028 $d
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:140    .text.main:00000000 $t
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:146    .text.main:00000000 main
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:263    .text.main:000000a0 $d
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:269    .text.main:000000b8 $t
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:468    .text.main:00000220 $d
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:494    .bss.btn2:00000000 btn2
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:488    .bss.btn2_state:00000000 btn2_state
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:500    .bss.btn1:00000000 btn1
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:482    .bss.led_flag:00000000 led_flag
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:483    .bss.led_flag:00000000 $d
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:489    .bss.btn2_state:00000000 $d
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:495    .bss.btn2:00000000 $d
+C:\Users\Nez3rt\AppData\Local\Temp\ccB2iw0w.s:501    .bss.btn1:00000000 $d
+
+UNDEFINED SYMBOLS
+Led_init
+Buttons_Init
+PD0_inp
+PD0_out

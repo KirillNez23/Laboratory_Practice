@@ -120,7 +120,8 @@ endif
 C_SOURCES =  \
 $(SYS) \
 Core/Src/main.c \
-
+Core/Src/init.c \
+Core/Src/interrupt.c \
 # ASM sources
 ASM_SOURCES =  \
 $(ASM)
@@ -240,13 +241,13 @@ $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
 	@echo "-----------------------------------------------------"	
 
 $(BUILD_DIR):
-	@"mkdir" -p $@
+	@mkdir $@
 
 #######################################
 # clean up
 #######################################
 clean:
-	@"rm" -fR $(BUILD_DIR)
+	@rm -fR $(BUILD_DIR)
   
 #######################################
 # openocd

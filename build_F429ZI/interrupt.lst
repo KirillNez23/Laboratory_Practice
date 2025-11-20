@@ -1,0 +1,157 @@
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"interrupt.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/interrupt.c"
+  20              		.section	.text.EXTI15_10_IRQHandler,"ax",%progbits
+  21              		.align	1
+  22              		.global	EXTI15_10_IRQHandler
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	EXTI15_10_IRQHandler:
+  28              	.LFB130:
+   1:Core/Src/interrupt.c **** // #include "interrupt.h"
+   2:Core/Src/interrupt.c **** 
+   3:Core/Src/interrupt.c **** // #define DELAY_BUTTON_FILTER 250
+   4:Core/Src/interrupt.c **** 
+   5:Core/Src/interrupt.c **** 
+   6:Core/Src/interrupt.c **** // uint8_t BtnCount;
+   7:Core/Src/interrupt.c **** // extern volatile uint32_t GlobalTickCount;
+   8:Core/Src/interrupt.c **** // extern volatile uint32_t BtnStartTick;
+   9:Core/Src/interrupt.c **** // extern uint8_t mode;
+  10:Core/Src/interrupt.c **** // extern uint8_t freq_mode;
+  11:Core/Src/interrupt.c **** 
+  12:Core/Src/interrupt.c **** // volatile uint32_t ExternInterruptTickCount;
+  13:Core/Src/interrupt.c **** 
+  14:Core/Src/interrupt.c **** // void EXTI15_10_IRQHandler(void)
+  15:Core/Src/interrupt.c **** // {
+  16:Core/Src/interrupt.c **** 
+  17:Core/Src/interrupt.c **** //     if(ExternInterruptTickCount >= DELAY_BUTTON_FILTER)
+  18:Core/Src/interrupt.c **** //     { 
+  19:Core/Src/interrupt.c **** //         BtnCount++; 
+  20:Core/Src/interrupt.c **** 
+  21:Core/Src/interrupt.c **** //     }
+  22:Core/Src/interrupt.c **** 
+  23:Core/Src/interrupt.c **** //     if(BtnCount == 2)
+  24:Core/Src/interrupt.c **** //     {
+  25:Core/Src/interrupt.c ****         
+  26:Core/Src/interrupt.c **** //         if(ExternInterruptTickCount  >= 2000)
+  27:Core/Src/interrupt.c **** //         {
+  28:Core/Src/interrupt.c **** //             if(freq_mode <2){freq_mode++;} 
+  29:Core/Src/interrupt.c **** //             else{ freq_mode = 0;}
+  30:Core/Src/interrupt.c **** 
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s 			page 2
+
+
+  31:Core/Src/interrupt.c **** 
+  32:Core/Src/interrupt.c ****             
+  33:Core/Src/interrupt.c **** //         }
+  34:Core/Src/interrupt.c **** //         if(ExternInterruptTickCount  < 2000 && ExternInterruptTickCount !=0)
+  35:Core/Src/interrupt.c **** //         {
+  36:Core/Src/interrupt.c **** //             if(mode < 2) {mode++;}
+  37:Core/Src/interrupt.c **** //             else {mode = 1;}
+  38:Core/Src/interrupt.c ****         
+  39:Core/Src/interrupt.c **** 
+  40:Core/Src/interrupt.c **** //         }
+  41:Core/Src/interrupt.c ****          
+  42:Core/Src/interrupt.c **** //     }
+  43:Core/Src/interrupt.c **** //     if(BtnCount>2)
+  44:Core/Src/interrupt.c **** //          { BtnCount = 1; ExternInterruptTickCount = 0;}
+  45:Core/Src/interrupt.c **** //     ExternInterruptTickCount = 0;
+  46:Core/Src/interrupt.c **** //     SET_BIT(EXTI->PR, EXTI_PR_PR13);
+  47:Core/Src/interrupt.c **** // }
+  48:Core/Src/interrupt.c **** 
+  49:Core/Src/interrupt.c **** // void SysTick_Handler(void)
+  50:Core/Src/interrupt.c **** // {
+  51:Core/Src/interrupt.c **** //     ExternInterruptTickCount++;
+  52:Core/Src/interrupt.c **** //     GlobalTickCount++;
+  53:Core/Src/interrupt.c **** 
+  54:Core/Src/interrupt.c **** // }
+  55:Core/Src/interrupt.c **** 
+  56:Core/Src/interrupt.c **** // void milis(uint32_t delay)
+  57:Core/Src/interrupt.c **** // {
+  58:Core/Src/interrupt.c **** //   uint32_t start = GlobalTickCount;                
+  59:Core/Src/interrupt.c **** // while ((uint32_t)(GlobalTickCount - start) < delay) {}
+  60:Core/Src/interrupt.c **** // }
+  61:Core/Src/interrupt.c **** 
+  62:Core/Src/interrupt.c **** #include "interrupt.h"
+  63:Core/Src/interrupt.c **** 
+  64:Core/Src/interrupt.c **** extern volatile uint8_t btncnt, flag;
+  65:Core/Src/interrupt.c **** void EXTI15_10_IRQHandler(){
+  29              		.loc 1 65 28 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  66:Core/Src/interrupt.c ****     SET_BIT(EXTI->PR, EXTI_PR_PR13);
+  34              		.loc 1 66 5 view .LVU1
+  35 0000 084A     		ldr	r2, .L2
+  36 0002 5369     		ldr	r3, [r2, #20]
+  37 0004 43F40053 		orr	r3, r3, #8192
+  38 0008 5361     		str	r3, [r2, #20]
+  67:Core/Src/interrupt.c ****     btncnt++;
+  39              		.loc 1 67 5 view .LVU2
+  40              		.loc 1 67 11 is_stmt 0 view .LVU3
+  41 000a 074A     		ldr	r2, .L2+4
+  42 000c 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  43 000e 0133     		adds	r3, r3, #1
+  44 0010 DBB2     		uxtb	r3, r3
+  45 0012 1370     		strb	r3, [r2]
+  68:Core/Src/interrupt.c ****     flag = !flag;
+  46              		.loc 1 68 5 is_stmt 1 view .LVU4
+  47              		.loc 1 68 12 is_stmt 0 view .LVU5
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s 			page 3
+
+
+  48 0014 054A     		ldr	r2, .L2+8
+  49 0016 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  50 0018 B3FA83F3 		clz	r3, r3
+  51 001c 5B09     		lsrs	r3, r3, #5
+  52              		.loc 1 68 10 view .LVU6
+  53 001e 1370     		strb	r3, [r2]
+  69:Core/Src/interrupt.c **** }...
+  54              		.loc 1 69 1 view .LVU7
+  55 0020 7047     		bx	lr
+  56              	.L3:
+  57 0022 00BF     		.align	2
+  58              	.L2:
+  59 0024 003C0140 		.word	1073822720
+  60 0028 00000000 		.word	btncnt
+  61 002c 00000000 		.word	flag
+  62              		.cfi_endproc
+  63              	.LFE130:
+  65              		.text
+  66              	.Letext0:
+  67              		.file 2 "C:/Users/Nez3rt/OneDrive/\320\240\320\260\320\261\320\276\321\207\320\270\320\271 \321\20
+  68              		.file 3 "C:/Users/Nez3rt/OneDrive/\320\240\320\260\320\261\320\276\321\207\320\270\320\271 \321\20
+  69              		.file 4 "CMSIS/Devices/STM32F4xx/Inc/STM32F429ZI/stm32f429xx.h"
+ARM GAS  C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 interrupt.c
+C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s:21     .text.EXTI15_10_IRQHandler:00000000 $t
+C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s:27     .text.EXTI15_10_IRQHandler:00000000 EXTI15_10_IRQHandler
+C:\Users\Nez3rt\AppData\Local\Temp\cca8rvYJ.s:59     .text.EXTI15_10_IRQHandler:00000024 $d
+
+UNDEFINED SYMBOLS
+btncnt
+flag
