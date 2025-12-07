@@ -1,5 +1,5 @@
 #include "init.h"
-#include "interrupt.h"
+#include "it_handlers.h"
 
 #include "../../CMSIS/Devices/STM32F4xx/Inc/STM32F429ZI/stm32f429xx.h"
 
